@@ -3,6 +3,8 @@
 # include "header.hpp"
 using namespace std;
 
+// Commentaire
+
 void print (const points& P){
 
     cout <<"("<<P.x<<","<<P.y<<","<<P.z<<")";
