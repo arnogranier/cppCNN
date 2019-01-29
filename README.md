@@ -1,3 +1,0 @@
-# cppCNN
-
-ziopefjseklfjklsejfklefjkljfklsejfkljfklsejfkls
