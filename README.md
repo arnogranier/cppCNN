@@ -3,7 +3,7 @@
 ## WORK IN PROGRESS ...
 A c++ implementation of Convolutional neural network, with a MNIST hand-written digits recognition application.
 
-You can find the proposed subject together with a brief introductive survey of CNN's theory here : 
+You can find the proposed subject together with a brief introductive survey of CNN's theory here : [Subject](https://www.petit-fichier.fr/2019/01/29/arnograniersujet/)
 
 ## Architecture
 ![alt text](https://image.noelshack.com/fichiers/2019/05/2/1548768726-uml.png)
@@ -13,4 +13,5 @@ You can find the proposed subject together with a brief introductive survey of C
 int main()
 {
 return 0;
-}```
+}
+```
