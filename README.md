@@ -7,7 +7,7 @@ A c++ implementation of Convolutional neural network, with a MNIST hand-written 
 You can find the proposed subject together with a brief introductive survey of CNN's theory here : [Subject](https://www.cjoint.com/doc/19_01/IADnLhx7Ve0_Arno-Granier-sujet.pdf)
 
 ## Architecture (so far)
-![alt text](https://image.noelshack.com/fichiers/2019/05/2/1548768726-uml.png)
+![alt text](https://image.noelshack.com/fichiers/2019/05/2/1548777284-diagram-cppcnn.png)
 
 ## Example of usage
 ```c++
