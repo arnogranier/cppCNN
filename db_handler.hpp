@@ -9,7 +9,7 @@ using namespace std;
 class DBHandler
 {
 public:
-    vector<vector<unsigned int8_t> > read_mnist_image(string);
+    vector<vector<double> > read_mnist_image(string);
     vector<unsigned int8_t > read_mnist_label(string);
 };
 #endif
