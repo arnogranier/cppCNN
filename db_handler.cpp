@@ -2,13 +2,15 @@
 
 int char4_to_int(char* p)
 {
-    return ((int)p[0]*pow(2,24)+(int)p[1]*pow(2,16)
-           +(int)p[2]*pow(2,8)+(int)p[3]);
+    return   (unsigned int8_t)p[0] * std::pow(2,24) 
+           + (unsigned int8_t)p[1] * std::pow(2,16)
+           + (unsigned int8_t)p[2] * std::pow(2,8)
+           + (unsigned int8_t)p[3];
 }
 
 vector<vector<double> > DBHandler::read_mnist_image(string filename)
 {
-    ifstream file(filename, ios::binary);
+    std::ifstream file(filename, ios::binary);
     vector<vector<double> > vec;
     assert(file.is_open());
     int8_t size_of_int32 = sizeof(int32_t);
@@ -30,7 +32,7 @@ vector<vector<double> > DBHandler::read_mnist_image(string filename)
         file.read(temp, size);
         for(int i = 0; i < size; ++i)
         {
-            im.push_back((double) temp[i]/255.0);
+            im.push_back((temp[i]==0)? 0.0 : 1.0);
         }
         vec.push_back(im);
     }
@@ -40,7 +42,7 @@ vector<vector<double> > DBHandler::read_mnist_image(string filename)
 
 vector<unsigned int8_t> DBHandler::read_mnist_label(string filename)
 {
-    ifstream file(filename, ios::binary);
+    std::ifstream file(filename, ios::binary);
     vector<unsigned int8_t> vec;
     assert(file.is_open());
     int8_t size_of_int32 = sizeof(int32_t);
@@ -50,12 +52,21 @@ vector<unsigned int8_t> DBHandler::read_mnist_label(string filename)
     assert(magic_number == 0x801);
     file.read(temphead, size_of_int32);
     int32_t number_of_labels = char4_to_int(temphead);
-    int8_t size_of_byte = 8;
     char temp;
     for(int n = 0; n < number_of_labels; ++n)
     {
-        file.read(&temp, size_of_byte);
+        file.read(&temp, 1);
         vec.push_back((unsigned int8_t) temp);
     }
     return vec;
+}
+
+void show_image(vector<double> im)
+{
+    for (uint y=0; y<28; ++y) {
+        for (uint x=0; x<28; ++x) {
+            std::cout << ((im[y*28+x] == 0)? ' ' : '*');
+        }
+        std::cout << std::endl;
+    }    
 }
