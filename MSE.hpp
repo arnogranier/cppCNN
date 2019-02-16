@@ -1,5 +1,5 @@
-#ifndef sigmoid
-
+#ifndef mse 
+#define mse
 #include <iostream>
 #include <vector>
 #include <math.h>

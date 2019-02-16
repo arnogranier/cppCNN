@@ -1,5 +1,5 @@
 #ifndef sigmoid
-
+#define sigmoid
 #include <iostream>
 #include <vector>
 #include <math.h>

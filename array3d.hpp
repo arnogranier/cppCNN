@@ -1,5 +1,5 @@
-#ifndef array2d
-
+#ifndef array3d
+#define array3d
 #include <iostream>
 using namespace std;
 #include <vector>

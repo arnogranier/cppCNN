@@ -2,7 +2,7 @@
 
 CNN::CNN(list<FCLayer> L, double x)
 {
-    layers = L;
+    classifier = L;
     lr = x;
 }
 
@@ -31,14 +31,14 @@ void CNN::set_db(string filename_train_images,
 vector<unsigned int8_t> CNN::feedforward(vector<vector<double> > inputs)
 {
     vector<unsigned int8_t> outputs;
+    outputs.reserve(inputs.size());
     for (vector<vector<double> >::iterator input = inputs.begin();input != inputs.end();++input){
         vector<double> A(*input);
-        for (list<FCLayer>::iterator l = layers.begin();l != layers.end();++l){
-            A = (*l).forward(A);
+        for (list<FCLayer>::iterator l = classifier.begin();l != classifier.end();++l){
+            A = l->forward(A);
             A.shrink_to_fit();
         };
-        int8_t output;
-        output = std::distance(A.begin(), std::max_element(A.begin(), A.end()));
+        int8_t output = std::distance(A.begin(), std::max_element(A.begin(), A.end()));
         outputs.push_back(output);
     }
     return outputs;
@@ -46,41 +46,37 @@ vector<unsigned int8_t> CNN::feedforward(vector<vector<double> > inputs)
 
 void CNN::train(uint n_epoch)
 {
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    uint rand_indxs[train_db_images.size()];
+    std::iota(&rand_indxs[0], &rand_indxs[train_db_images.size()], 0);
     std::cout<<"Start training for "<<n_epoch<<" epochs"<<std::endl;
+    stack<vector<double> > zs;
+    vector<double> A, z, lz, backwrd_err, layer_err;
     for (uint n=0; n<n_epoch;++n){
         std::cout<<"\r"<<"Epoch "<<n+1<<std::flush;
-        std::random_device rd;
-        std::default_random_engine generator(rd());
-        vector<int> rand_indxs(train_db_images.size());
-        std::iota(rand_indxs.begin(), rand_indxs.end(), 0);
-        std::shuffle(rand_indxs.begin(), rand_indxs.end(), generator);
-
-        stack<vector<double> > zs;
-        vector<double> A, z;
-        for (vector<int>::iterator i=rand_indxs.begin();i!=rand_indxs.end();++i){
-            A = train_db_images[*i];
+        std::shuffle(&rand_indxs[0], &rand_indxs[train_db_images.size()], generator);
+        
+        for (const auto& i:rand_indxs){
+            A = train_db_images[i];
             zs.push(A);
-            for(list<FCLayer>::iterator l=layers.begin();
-                  l!=layers.end();++l){
-                z = (*l).compute(A);
-                z.shrink_to_fit();
+            for(list<FCLayer>::iterator l=classifier.begin();
+                  l!=classifier.end();++l){
+                z = l->compute(A);
                 zs.push(z);
-                A = (*l).activate(z);
+                A = l->activate(z);
             }
         
-            vector<double> backwrd_err = loss.deriv(A, train_db_labels[*i]);
-            vector<double> lz = zs.top();
+            backwrd_err = loss.deriv(A, train_db_labels[i]);
+            lz = zs.top();
             zs.pop();
-            vector<double> layer_err;
-            for(list<FCLayer>::reverse_iterator l=layers.rbegin();
-                  l!=layers.rend();++l){
-                layer_err = (*l).get_layer_err(lz, backwrd_err);
-                layer_err.shrink_to_fit();
+            for(list<FCLayer>::reverse_iterator l=classifier.rbegin();
+                  l!=classifier.rend();++l){
+                layer_err = l->get_layer_err(lz, backwrd_err);
                 lz = zs.top();
                 zs.pop();
-                backwrd_err = (*l).backward(layer_err);
-                
-                (*l).update(layer_err, lz, lr);
+                backwrd_err = l->backward(layer_err);
+                l->update(layer_err, lz, lr);
             }
             assert(zs.empty());
         }

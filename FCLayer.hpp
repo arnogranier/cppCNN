@@ -1,4 +1,5 @@
-#ifndef FCLayer
+#ifndef fclayer 
+#define fclayer
 #include <array2d.hpp>
 #include <Sigmoid.hpp>
 using namespace std;
@@ -9,7 +10,7 @@ private:
     Array2d W;
     Sigmoid fun;
 public:
-    int nb_in, nb_out;
+    uint nb_in, nb_out;
     FCLayer(int, int);
     void initialize();
     vector<double> forward(const vector<double>&);

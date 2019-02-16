@@ -1,4 +1,5 @@
 #ifndef db_handler
+#define db_handler
 #include <vector>
 #include <fstream>
 #include <math.h>

@@ -27,10 +27,10 @@ int main()
     list<FCLayer> layers{l1, l2};
     
     // Learning rate
-    double lr = 0.02;
+    double lr = 0.1;
     
     // Number of epochs
-    uint n_epoch = 10;
+    uint n_epoch = 1;
     
     
     /* * MAIN * */

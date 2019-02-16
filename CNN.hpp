@@ -4,6 +4,7 @@
 #include <FCLayer.hpp>
 #include <db_handler.hpp>
 #include <MSE.hpp>
+#include <Layer3D.hpp>
 
 #include <iostream>
 #include <list>
@@ -12,13 +13,14 @@
 #include <stack>
 #include <iterator>
 #include <ctime>
+#include <array>
 
 using namespace std;
 
 class CNN
 {
 private:
-    list<FCLayer> layers;
+    list<FCLayer> classifier;
     MSE loss;
     double lr;
     vector<vector<double> > train_db_images;
