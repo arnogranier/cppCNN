@@ -6,7 +6,9 @@ using namespace std;
 
 class Layer3D
 {
+public:
     virtual void initialize() = 0;
+    virtual ~Layer3D(){};
     virtual Array3d compute(const Array3d&) = 0;
     virtual Array3d activate(const Array3d&) = 0;
     virtual Array3d forward(const Array3d&) = 0;

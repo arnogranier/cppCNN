@@ -4,7 +4,9 @@
 #include <FCLayer.hpp>
 #include <db_handler.hpp>
 #include <MSE.hpp>
-#include <Layer3D.hpp>
+#include <ConvLayer.hpp>
+#include <MaxPoolLayer.hpp>
+#include <array3d.hpp>
 
 #include <iostream>
 #include <list>
@@ -20,6 +22,7 @@ using namespace std;
 class CNN
 {
 private:
+    list<Layer3D*> feature_detector;
     list<FCLayer> classifier;
     MSE loss;
     double lr;
@@ -28,7 +31,7 @@ private:
     vector<vector<double> > test_db_images;
     vector<unsigned int8_t > test_db_labels;
 public:
-    CNN(list<FCLayer>, double);
+    CNN(list<Layer3D*>, list<FCLayer>, double);
     void initialize();
     vector<unsigned int8_t> feedforward(vector<vector<double> >);
     void train(uint);

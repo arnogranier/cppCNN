@@ -12,6 +12,7 @@ void ConvLayer::initialize()
 
 Array3d ConvLayer::compute(const Array3d&)
 {
+    cout << "Conv" <<endl;
     return Array3d();
 };
 

@@ -12,6 +12,7 @@ void MaxPoolLayer::initialize()
 
 Array3d MaxPoolLayer::compute(const Array3d&)
 {
+    cout << "MaxP" << endl;
     return Array3d();
 };
 

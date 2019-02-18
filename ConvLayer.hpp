@@ -14,6 +14,7 @@ private:
 public:
     int F, K, S, P;
     ConvLayer(int, int, int, int);
+    virtual ~ConvLayer(){};
     virtual void initialize() ;
     virtual Array3d compute(const Array3d&) ;
     virtual Array3d activate(const Array3d&) ;

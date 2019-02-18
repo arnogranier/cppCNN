@@ -1,7 +1,8 @@
 #include "CNN.hpp"
 
-CNN::CNN(list<FCLayer> L, double x)
+CNN::CNN(list<Layer3D*> F, list<FCLayer> L, double x)
 {
+    feature_detector = F;
     classifier = L;
     lr = x;
 }
@@ -33,6 +34,9 @@ vector<unsigned int8_t> CNN::feedforward(vector<vector<double> > inputs)
     vector<unsigned int8_t> outputs;
     outputs.reserve(inputs.size());
     for (vector<vector<double> >::iterator input = inputs.begin();input != inputs.end();++input){
+        
+        // TODO- feedforward thrugh 3d layers
+        
         vector<double> A(*input);
         for (list<FCLayer>::iterator l = classifier.begin();l != classifier.end();++l){
             A = l->forward(A);
@@ -53,11 +57,19 @@ void CNN::train(uint n_epoch)
     std::cout<<"Start training for "<<n_epoch<<" epochs"<<std::endl;
     stack<vector<double> > zs;
     vector<double> A, z, lz, backwrd_err, layer_err;
+    
+    //Little test
+    Array3d Aoy;
+    for (auto l:feature_detector) l->compute(Aoy);
+    
     for (uint n=0; n<n_epoch;++n){
         std::cout<<"\r"<<"Epoch "<<n+1<<std::flush;
         std::shuffle(&rand_indxs[0], &rand_indxs[train_db_images.size()], generator);
         
         for (const auto& i:rand_indxs){
+            
+            // TODO- feedforward through 3d layers
+            
             A = train_db_images[i];
             zs.push(A);
             for(list<FCLayer>::iterator l=classifier.begin();
@@ -79,6 +91,8 @@ void CNN::train(uint n_epoch)
                 l->update(layer_err, lz, lr);
             }
             assert(zs.empty());
+            
+            // TODO- backpropagate and update through 3d layers
         }
     }
     std::cout<<std::endl;

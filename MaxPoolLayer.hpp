@@ -9,6 +9,7 @@ class MaxPoolLayer : public Layer3D
 public:
     int K, S;
     MaxPoolLayer(int, int);
+    virtual ~MaxPoolLayer(){};
     virtual void initialize();
     virtual Array3d compute(const Array3d&) ;
     virtual Array3d activate(const Array3d&) ;
