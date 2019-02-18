@@ -50,7 +50,7 @@ int main()
     CNN net(feature_detector, classifier, lr);
     
     // Read and set the database
-    net.set_db(filename_test_images, filename_test_labels, 
+    net.set_db(filename_train_images, filename_train_labels, 
                filename_test_images, filename_test_labels);
     
     // Training phase
