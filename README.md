@@ -9,17 +9,18 @@ You can find the proposed subject together with a brief introductive survey of C
 Currently training at 96% on a dirty implementation of LeNet after 10 epochs. (architecture introduced in _LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324._) 
 
 To-do list:
+Mandatory :
   -  clean up the code
   -  comment
   -  network learnable parameters saving and retrieving 
+  
+Optional:
   +  minibatch learning
   +  parallelism (threads)
   +  easier way of passing the net architecture
   +  other optimisation methods (adam, adagrad, momentum gradient descent)
   +  cross entropy loss
   +  other applications
-  
-(- are mandatory, + are optional)
 
 ## Architecture
    ![alt text](https://image.noelshack.com/fichiers/2019/08/1/1550521768-cppcnn-2.png)
