@@ -13,7 +13,7 @@ Currently training at 96% on a dirty implementation of LeNet after 10 epochs. (a
 Mandatory :
   -  clean up the code
   -  comment
-  -  network learnable parameters saving and retrieving 
+  -  learnable parameters saving and retrieving 
   
 Optional:
   +  minibatch learning
