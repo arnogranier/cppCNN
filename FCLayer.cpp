@@ -4,13 +4,12 @@ FCLayer::FCLayer(int l, int L)
 {
     nb_in=l;
     nb_out=L;  
-    Array2d tempW(nb_out, nb_in, 1);
-    W = std::move(tempW);
+    initialize();
 };
 
 void FCLayer::initialize()
 {
-    Array2d tempW(nb_out, nb_in, 1);
+    Array2d tempW(nb_out, nb_in);
     W = std::move(tempW);
 };
 

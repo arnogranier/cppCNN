@@ -8,10 +8,10 @@ int char4_to_int(char* p)
            + (unsigned int8_t)p[3];
 }
 
-vector<vector<double> > DBHandler::read_mnist_image(string filename)
+vector<Array3d> DBHandler::read_mnist_image(string filename)
 {
     std::ifstream file(filename, ios::binary);
-    vector<vector<double> > vec;
+    vector<Array3d> vec;
     assert(file.is_open());
     int8_t size_of_int32 = sizeof(int32_t);
     char temphead[size_of_int32];
@@ -32,13 +32,13 @@ vector<vector<double> > DBHandler::read_mnist_image(string filename)
         file.read(temp, size);
         for(int i = 0; i < size; ++i)
         {
-            im.push_back((temp[i]==0)? 0.0 : 1.0);
+            im.push_back((temp[i]==0)? 0:1);
         }
-        vec.push_back(im);
+        vec.push_back(Array3d(nrows, ncols, 1, im));
     }
     delete [] temp;
     return vec;
-}
+};
 
 vector<unsigned int8_t> DBHandler::read_mnist_label(string filename)
 {
@@ -61,11 +61,11 @@ vector<unsigned int8_t> DBHandler::read_mnist_label(string filename)
     return vec;
 }
 
-void show_image(vector<double> im)
+void show_image(Array3d im)
 {
     for (uint y=0; y<28; ++y) {
         for (uint x=0; x<28; ++x) {
-            std::cout << ((im[y*28+x] == 0)? ' ' : '*');
+            std::cout << ((im(y,x,0) == 0)? ' ' : '*');
         }
         std::cout << std::endl;
     }    

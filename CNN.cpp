@@ -1,18 +1,19 @@
 #include "CNN.hpp"
 
-CNN::CNN(list<Layer3D*> F, list<FCLayer> L, double x)
+CNN::CNN(list<Layer3D*> F, list<FCLayer> L, double x, double y)
 {
     feature_detector = F;
     classifier = L;
-    lr = x;
+    c_lr = x;
+    fd_lr = y;
 }
 
-void CNN::set_train_db(vector<vector<double> >& ims, vector<unsigned int8_t >& labels)
+void CNN::set_train_db(vector<Array3d>& ims, vector<unsigned int8_t >& labels)
 {
     train_db_images = ims ; train_db_labels = labels;
 };
 
-void CNN::set_test_db(vector<vector<double> >& ims, vector<unsigned int8_t >& labels)
+void CNN::set_test_db(vector<Array3d>& ims, vector<unsigned int8_t >& labels)
 {
     test_db_images = ims ; test_db_labels = labels;
 }
@@ -29,20 +30,26 @@ void CNN::set_db(string filename_train_images,
     test_db_labels = db.read_mnist_label(filename_test_labels);
 }
 
-vector<unsigned int8_t> CNN::feedforward(vector<vector<double> > inputs)
+vector<unsigned int8_t> CNN::predict(vector<Array3d> inputs)
 {
     vector<unsigned int8_t> outputs;
     outputs.reserve(inputs.size());
-    for (vector<vector<double> >::iterator input = inputs.begin();input != inputs.end();++input){
+    Array3d A;
+    vector<double> a;
+    for (vector<Array3d>::iterator input = inputs.begin();input != inputs.end();++input){
         
-        // TODO- feedforward thrugh 3d layers
+        A = *input;
+        for(auto l:feature_detector){
+                A = l->forward(A);
+                
+            }
+        a = A.flatten();
         
-        vector<double> A(*input);
         for (list<FCLayer>::iterator l = classifier.begin();l != classifier.end();++l){
-            A = l->forward(A);
-            A.shrink_to_fit();
+            a = l->forward(a);
+            a.shrink_to_fit();
         };
-        int8_t output = std::distance(A.begin(), std::max_element(A.begin(), A.end()));
+        int8_t output = std::distance(a.begin(), std::max_element(a.begin(), a.end()));
         outputs.push_back(output);
     }
     return outputs;
@@ -55,31 +62,38 @@ void CNN::train(uint n_epoch)
     uint rand_indxs[train_db_images.size()];
     std::iota(&rand_indxs[0], &rand_indxs[train_db_images.size()], 0);
     std::cout<<"Start training for "<<n_epoch<<" epochs"<<std::endl;
-    stack<vector<double> > zs;
-    vector<double> A, z, lz, backwrd_err, layer_err;
     
-    //Little test
-    Array3d Aoy;
-    for (auto l:feature_detector) l->compute(Aoy);
+    stack<Array3d> Zs;
+    Array3d A, Z, LZ, Backwrd_err, Layer_err;
+    
+    stack<vector<double> > zs;
+    vector<double> a, z, lz, backwrd_err, layer_err;
     
     for (uint n=0; n<n_epoch;++n){
         std::cout<<"\r"<<"Epoch "<<n+1<<std::flush;
         std::shuffle(&rand_indxs[0], &rand_indxs[train_db_images.size()], generator);
         
-        for (const auto& i:rand_indxs){
-            
-            // TODO- feedforward through 3d layers
-            
+        for (const auto& i:rand_indxs){ 
             A = train_db_images[i];
-            zs.push(A);
+            Zs.push(A);
+            for(auto l:feature_detector){
+                Z = l->compute(A);
+                Zs.push(Z);
+                A = l->activate(Z);
+            }
+            
+            a = A.flatten();
+
+            zs.push(a);
             for(list<FCLayer>::iterator l=classifier.begin();
                   l!=classifier.end();++l){
-                z = l->compute(A);
+                z = l->compute(a);
                 zs.push(z);
-                A = l->activate(z);
+                a = l->activate(z);
             }
         
-            backwrd_err = loss.deriv(A, train_db_labels[i]);
+            backwrd_err = loss.deriv(a, train_db_labels[i]);
+            
             lz = zs.top();
             zs.pop();
             for(list<FCLayer>::reverse_iterator l=classifier.rbegin();
@@ -88,11 +102,25 @@ void CNN::train(uint n_epoch)
                 lz = zs.top();
                 zs.pop();
                 backwrd_err = l->backward(layer_err);
-                l->update(layer_err, lz, lr);
+                l->update(layer_err, lz, c_lr);
             }
             assert(zs.empty());
             
-            // TODO- backpropagate and update through 3d layers
+            
+            LZ = Zs.top();
+            Zs.pop();
+            
+            Array3d Backwrd_err(LZ.n,LZ.m,LZ.h,backwrd_err);
+            
+            for(list<Layer3D*>::reverse_iterator l=feature_detector.rbegin();
+                  l!=feature_detector.rend();++l){
+                Layer_err = (*l)->get_layer_err(LZ, Backwrd_err);
+                LZ = Zs.top();
+                Zs.pop();
+                Backwrd_err = (*l)->backward(Layer_err, LZ);
+                (*l)->update(Layer_err, LZ, fd_lr);
+            }
+            assert(Zs.empty());
         }
     }
     std::cout<<std::endl;
@@ -101,7 +129,7 @@ void CNN::train(uint n_epoch)
 double CNN::test_accuracy()
 {
     int size = test_db_labels.size();
-    vector<unsigned int8_t> out = feedforward(test_db_images);
+    vector<unsigned int8_t> out = predict(test_db_images);
     int count_good_pred = 0;
     for (int i=0;i<size;++i){
         if (out[i]==test_db_labels[i]){

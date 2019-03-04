@@ -1,25 +1,16 @@
 #include "array2d.hpp"
 
-Array2d::Array2d(uint rows, uint cols, bool initrandom)
+Array2d::Array2d(uint rows, uint cols)
 {
     n=rows;m=cols;
-    if (initrandom){
-        std::random_device rd;
-        std::default_random_engine generator(rd());
-        std::normal_distribution<double> distribution(0, 1.0/m);
-        int size = n * m;
-        val.reserve(size);
-        for (int i=0;i<size;i++){
-            val.push_back(distribution(generator));
-        };
-    }
-    else{
-        int size = n * m;
-        val.reserve(size);
-        for (int i=0;i<size;i++){
-            val.push_back(0.0);
-        };
-    }
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::normal_distribution<double> distribution(0, 1.0/m);
+    uint size = n * m;
+    val.reserve(size);
+    for (uint i=0;i<size;i++){
+        val.push_back(distribution(generator));
+    };
 };
 
 Array2d& Array2d::operator*=(double d)
@@ -33,13 +24,6 @@ Array2d& Array2d::operator-=(const Array2d & A)
 {
     transform(val.begin(), val.end(), A.val.begin(), val.begin(),
               minus<double>());
-    return *this;
-};
-
-Array2d& Array2d::operator+=(const Array2d & A)
-{
-    transform(val.begin(), val.end(), A.val.begin(), val.begin(),
-              plus<double>());
     return *this;
 };
 

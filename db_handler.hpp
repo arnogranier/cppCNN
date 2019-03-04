@@ -5,14 +5,15 @@
 #include <math.h>
 #include <assert.h>
 #include <iostream>
+#include <array3d.hpp>
 using namespace std;
 
 class DBHandler
 {
 public:
-    vector<vector<double> > read_mnist_image(string);
+    vector<Array3d> read_mnist_image(string);
     vector<unsigned int8_t> read_mnist_label(string);
 };
 
-void show_image(vector<double>);
+void show_image(Array3d);
 #endif

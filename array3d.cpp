@@ -1,275 +1,103 @@
 #include "array3d.hpp"
-#include <iostream>
-using namespace std;
-#include <vector>
 
-/*****CONSTRUCTEURS ET DESTRUCTEUR*******/
-Array3d::Array3d(){
-    height = 0;
-    width = 0;
-    depth = 0;
-    val = NULL;
-}
-
-Array3d::Array3d(int h , int w ,int d, double v){
-    height = h;
-    width = w;
-    depth = d;
-    val = new double ** [height];
-    for (int i=0; i<height; i++){
-        val[i] = new double * [width];
-        for(int j=0; j<width; j ++){
-            val[i][j] = new double [depth];
-            for(int k=0; k<depth; k ++){
-                val[i][j][k] = v;
-            }
-        }
-
-    }
-}
-
-Array3d::~Array3d(){
-   for(int i=0; i<height; i ++){
-        for(int j=0;j<width;j++){
-            delete[] val[i][j];
-        }
-        delete[] val[i];
-    }
-    delete[] val;
-}
-
-Array3d::Array3d(const Array3d & A){
-    height = A.height;
-    width = A.width;
-    depth = A.depth;
-
-    val = new double** [height];
-    for (int i = 0; i < height; i++){
-        val[i] = new double*[width];
-        for (int j = 0; j < width; j++){
-            val[i][j] = new double [depth];
-            for(int k=0; k<depth; k ++){
-                val[i][j][k] = A.val[i][j][k];
-            }
-        }
-   }
-}
-
-Array3d::Array3d(const vector<double> & v, int h, int w, int d){
-    height = h;
-    width = w;
-    depth = d;
-    val = new double** [height];
-    for (int i = 0; i < height; i++){
-        val[i] = new double*[width];
-        for (int j = 0; j < width; j++){
-            val[i][j] = new double [depth];
-            for(int k=0; k<depth; k ++){
-                val[i][j][k] = v.at((i*width+j)*depth+k);
-            }
-        }
-   }
-
-}
-
-vector<double> Array3d::to_vector(){
-    int taille = height*width*depth;
-    vector<double> v(taille);
-    for (int i = 0; i < height; i++){
-        val[i] = new double*[width];
-        for (int j = 0; j < width; j++){
-            val[i][j] = new double [depth];
-            for(int k=0; k<depth; k ++){
-                v.at((i*width+j)*depth+k)= val[i][j][k] ;
-            }
-        }
-   }
-   return v;
-}
-
-
-/****************OPERATEURS*************/
-double & Array3d::operator()(int i,int j,int k)
+Array3d::Array3d(uint rows, uint cols, uint height)
 {
-  return val[i][j][k];
+    n=rows;m=cols;h=height;
+    uint size = n * m * h;
+    val.reserve(size);
+    for (uint i=0;i<size;i++){
+        val.push_back(0);
+    };
+};
+
+void Array3d::fill_random()
+{
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::normal_distribution<double> distribution(0.01, 1.0/((n+m+h)));
+    val.clear();
+    uint size = n * m * h;
+    val.reserve(size);
+    for (uint i=0;i<size;i++){
+        val.push_back(distribution(generator));
+    }
+};
+
+void Array3d::zero_padding(int P)
+{
+    //todo
 }
 
-Array3d & Array3d::operator*=( double x){
-    for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] *= x;
-            }
-        }
-    }
+Array3d& Array3d::operator*=(double d)
+{
+    transform(val.begin(), val.end(), val.begin(),
+              bind1st(multiplies<double>(), d));
     return *this;
-}
+};
 
-Array3d & Array3d::operator+=( double x){
-    for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] += x;
-            }
-        }
-    }
+Array3d& Array3d::operator-=(const Array3d & A)
+{
+    transform(val.begin(), val.end(), A.val.begin(), val.begin(),
+              minus<double>());
     return *this;
-}
-Array3d & Array3d::operator-=( double x){
-    for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] -= x;
-            }
-        }
-    }
+};
+
+Array3d& Array3d::operator+=(const Array3d & A)
+{
+    transform(val.begin(), val.end(), A.val.begin(), val.begin(),
+              plus<double>());
     return *this;
-}
+};
 
-Array3d & Array3d::operator/=( double x){
-    for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] /= x;
+Array3d Array3d::operator*(const Array3d & A) const
+{
+    Array3d out(*this);
+    transform(out.val.begin(), out.val.end(), A.val.begin(), out.val.begin(),
+              multiplies<double>());
+    return out;
+};
+
+double Array3d::convolve(const Array3d & CONV, int start_i, int start_j) const
+{
+    double res = 0.0;
+    assert((CONV.h == this->h));
+    
+    for (uint k=0;k<h;++k){
+        for (uint i=0;i<CONV.n;++i){
+            for (uint j=0;j<CONV.m;++j){
+                res += CONV(i,j,k) * (*this)(i+start_i,j+start_j,k);
             }
         }
     }
-    return *this;
+    return res;
 }
 
-Array3d & Array3d::operator+=(const Array3d &A){
-   for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] += A.val[i][j][k];
+
+double Array3d::operator()(uint i, uint j, uint k) const
+{
+    return val[n*m*k+m*i+j];
+}
+
+double& Array3d::operator()(uint i, uint j, uint k)
+{
+    return val[n*m*k+m*i+j];
+}
+
+
+void Array3d::set(int i, int j, int k, double v)
+{
+    val[k*m*n+i*m+j] = v;
+}
+
+void Array3d::print()
+{
+    for (uint k=0;k<h;++k){
+        for (uint i=0;i<n;i++){
+            for (uint j=0;j<m;j++){
+                std::cout << val[k*m*n+i*m+j] << " ";
             }
+            std::cout << std::endl;
         }
+        std::cout << "-----" << endl;
     }
-    return *this;
-}
-Array3d & Array3d::operator-=(const Array3d &A){
-   for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] -= A.val[i][j][k];
-            }
-        }
-    }
-    return *this;
-}
-
-Array3d & Array3d::operator*=(const Array3d &A){
-   for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0; k<depth; k++){
-                val[i][j][k] *= A.val[i][j][k];
-            }
-        }
-    }
-    return *this;
-}
-
-bool Array3d::operator ==(const Array3d &A){
-    if(height != A.height || width != A.width || depth != A.depth){
-        return false;
-    }
-    for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0;k<depth;k++){
-                if(val[i][j][k] != A.val[i][j][k]){
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
-}
-
-bool Array3d::operator != (const Array3d &A){
-    if(height != A.height || width != A.width || depth != A.depth){
-        return true;
-    }
-    for(int i=0; i<height; i++){
-        for(int j=0; j<width; j++){
-            for(int k=0;k<depth;k++){
-                if(val[i][j][k] != A.val[i][j][k]){
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-Array3d & Array3d::operator=(const Array3d &A){
-    if(height != A.height || width != A.width || depth != A.depth) {
-        for(int i=0; i<height; i ++){
-            for(int j=0;j<width;j++){
-                delete[] val[i][j];
-            }
-            delete[] val[i];
-        }
-        delete[] val;
-    }
-
-    height = A.height;
-    width = A.width;
-    depth = A.depth;
-    val = new double ** [height];
-
-    for (int i=0; i<height; i++){
-        val[i] = new double * [width];
-        for(int j=0; j<width; j ++){
-            val[i][j] = new double [depth];
-            for(int k=0; k<depth; k ++){
-                val[i][j][k] = A.val[i][j][k];
-            }
-        }
-
-    }
-}
-
-Array3d operator + (const Array3d &  A , double x){
-    Array3d res(A);
-	return (res+=x);
-
-}
-Array3d operator - (const Array3d &  A , double x){
-    Array3d res(A);
-	return (res-=x);
-}
-Array3d operator /(const Array3d &  A , double x){
-    Array3d res(A);
-	return (res/=x);
-}
-Array3d operator *(const Array3d &  A , double x){
-    Array3d res(A);
-	return (res*=x);
-}
-
-Array3d operator + (double x , const Array3d &  A ){
-    Array3d res(A);
-	return (res+x);
-}
-Array3d operator - (double x , const Array3d &  A){
-    Array3d res(A);
-	return (res-x);
-}
-Array3d operator *(double x , const Array3d &  A){
-    Array3d res(A);
-	return (res*x);
-}
-
-
-Array3d operator + (const Array3d & A,const Array3d & B){
-    Array3d res(A);
-	return (res+=B);
-}
-Array3d operator - (const Array3d & A,const Array3d & B){
-    Array3d res(A);
-	return (res-=B);
-}
-Array3d operator *(const Array3d &  A , const Array3d &  B){
-    Array3d res(A);
-	return (res*=B);
-}
+};

@@ -20,3 +20,17 @@ vector<double> Sigmoid::deriv2(const vector<double> &already_computed_Sigmoid)
     for (auto x : already_computed_Sigmoid) vout.push_back(1-pow(x,2));
     return vout;
 }
+
+Array3d Sigmoid::compute(const Array3d& v)
+{
+    Array3d out(v);
+    out.val = compute(v.val);
+    return out;
+}
+
+Array3d Sigmoid::deriv(const Array3d& v)
+{
+    Array3d out(v);
+    out.val = deriv(v.val);
+    return out;
+}
