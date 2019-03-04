@@ -52,15 +52,21 @@ Array3d ConvLayer::get_layer_err(const Array3d& Z, const Array3d& Backwarded_err
 Array3d ConvLayer::backward(const Array3d& Layer_err, const Array3d& Z)
 {
     Array3d out(S*(Layer_err.n-1)+F-2*P,S*(Layer_err.m-1)+F-2*P,prev_depth);
-    for (uint r=0;r<S;++r){
-        for (uint t=0;t<prev_depth;++t){
+    Array3d filter;
+    int h_shift, w_shift;
+    double err;
+    for (uint r=0;r<K;++r){
+        filter = filters[r];
             for (uint i=0;i<Layer_err.n;++i){
-                int h_shift = i * S;
+                h_shift = i * S;
                 for (uint j=0;j<Layer_err.m;++j){
-                    int w_shift = j * S;
+                    err = Layer_err(i,j,r);
+                    w_shift = j * S;
+                    
                     for (uint p=0;p<F;++p){
                         for (uint q=0;q<F;++q){
-                            out(p+h_shift,q+w_shift,t) += filters[r](p,q,t)*Layer_err(i,j,r);
+                            for (uint t=0;t<prev_depth;++t){
+                            out(p+h_shift,q+w_shift,t) += filter(p,q,t)*err;
                         }
                     }
                 }
@@ -72,7 +78,7 @@ Array3d ConvLayer::backward(const Array3d& Layer_err, const Array3d& Z)
 
 void ConvLayer::update(const Array3d& Layer_err, const Array3d& Z, double lr)
 {
-        for (uint r=0;r<S;++r){
+        for (uint r=0;r<K;++r){
             for (uint t=0;t<prev_depth;++t){
                 for (uint i=0;i<Layer_err.n;++i){
                     int h_shift = i * S;
@@ -80,7 +86,7 @@ void ConvLayer::update(const Array3d& Layer_err, const Array3d& Z, double lr)
                         int w_shift = j * S;
                         for (uint p=0;p<F;++p){
                             for (uint q=0;q<F;++q){
-                                filters[r](p,q,t) -= 0.0005*Z(p+h_shift,q+w_shift,t)*Layer_err(i,j,r);
+                                filters[r](p,q,t) -= lr*Z(p+h_shift,q+w_shift,t)*Layer_err(i,j,r);
                         }
                     }
                 }
