@@ -17,6 +17,7 @@ Mandatory :
   
 Optional:
   +  minibatch learning
+  +  padding
   +  parallelism (threads)
   +  easier way of passing the net architecture
   +  other optimisation methods (adam, adagrad, momentum gradient descent)
