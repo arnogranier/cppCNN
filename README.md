@@ -6,6 +6,21 @@ A c++ implementation of Convolutional neural network, with an application on MNI
 
 You can find the proposed subject together with a brief introductive survey of CNN's theory here : [Subject](https://www.cjoint.com/doc/19_01/IADnLhx7Ve0_Arno-Granier-sujet.pdf)
 
+Currently training at 96% on a dirty implementation of LeNet after 10 epochs. (architecture introduced in _LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324._) 
+
+To-do list:
+  -  clean up the code
+  -  comment
+  -  network learnable parameters saving and retrieving 
+  +  minibatch learning
+  +  parallelism (threads)
+  +  easier way of passing the net architecture
+  +  other optimisation methods (adam, adagrad, momentum gradient descent)
+  +  cross entropy loss
+  +  other applications
+  
+(- are mandatory, + are optional)
+
 ## Architecture
    ![alt text](https://image.noelshack.com/fichiers/2019/08/1/1550521768-cppcnn-2.png)
 
@@ -13,13 +28,14 @@ You can find the proposed subject together with a brief introductive survey of C
 ```c++
 #include <iostream>
 #include <list>
+#include <ctime>
 #include <CNN.hpp>
 using namespace std;
 
 int main()
 {
     
-    /* * PARAMETERS * */
+    // * PARAMETERS * 
     
     // path to database
     string filename_train_images = "../../MNIST/train-images-idx3-ubyte";
@@ -28,40 +44,50 @@ int main()
     string filename_test_labels = "../../MNIST/t10k-labels-idx1-ubyte";
     
     // Feature detector architecture
-    Layer3D* f1 = new ConvLayer(20, 3, 1, 1);
+    Layer3D* f1 = new ConvLayer(5, 1, 6, 1, 0);
     Layer3D* p1 = new MaxPoolLayer(2, 2);
-    list<Layer3D*> feature_detector{f1, p1};
+    Layer3D* f2 = new ConvLayer(5, 6, 16, 1, 0);
+    Layer3D* p2 = new MaxPoolLayer(2, 2);
+    list<Layer3D*> feature_detector{f1, p1, f2, p2};
     
     // Classifier architecture
-    FCLayer l1(28*28, 16);
-    FCLayer l2(16, 10);
+    FCLayer l1(4*4*16, 84);
+    FCLayer l2(84, 10);
     list<FCLayer> classifier{l1, l2};
     
-    // Learning rate
-    double lr = 0.1;
+    // Learning rates
+    double classifier_lr = 0.01;
+    double feature_detector_lr = 0.0005;
     
     // Number of epochs
-    uint n_epoch = 1;
+    uint n_epoch = 10;
     
     
-    /* * MAIN * */
+    // * MAIN * 
     
-    // Building the classifier
-    CNN net(feature_detector, classifier, lr);
+    // Building the network
+    CNN net(feature_detector, classifier, classifier_lr, feature_detector_lr);
     
     // Read and set the database
     net.set_db(filename_train_images, filename_train_labels, 
                filename_test_images, filename_test_labels);
+
+    // Accuracy test
+    double acc;
+    acc = net.test_accuracy();
+    cout << "Accuracy on test dataset: " << acc << " % " << endl;
     
     // Training phase
     net.train(n_epoch);
     
     // Accuracy test
-    double acc = net.test_accuracy();
+    acc = net.test_accuracy();
     cout << "Accuracy on test dataset: " << acc << " % " << endl;
     
     
     for (auto pointer:feature_detector) delete pointer;
+
+    
     return 0;
 }
 ```
