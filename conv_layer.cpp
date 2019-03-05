@@ -103,6 +103,7 @@ void ConvLayer::update(const Array3d& Layer_err, const Array3d& Z, double lr)
     }
 };
 
+
 vector<vector<double> > ConvLayer::get_learnable_parameters()
 {
     vector<vector<double> > parameters;

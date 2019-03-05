@@ -4,6 +4,7 @@
 #include <sigmoid.hpp>
 using namespace std;
 
+
 class FCLayer
 {
 private:

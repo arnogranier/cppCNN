@@ -53,6 +53,7 @@ void FCLayer::update(const vector<double>& u, const vector<double>& v, double lr
     } 
 };
 
+
 vector<double> FCLayer::get_learnable_parameters()
 {
     return W.val;

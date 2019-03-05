@@ -176,6 +176,7 @@ istream& operator>>(istream& is, CNN& s)
     
     uint n_vec, length3d, length2d;
     
+    
     for(auto l:s.feature_detector){
         if (l->is_learnable()){
             actual_parameters3d = l->get_learnable_parameters();

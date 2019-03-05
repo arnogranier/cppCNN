@@ -4,6 +4,7 @@
 #include <layer3d.hpp>
 using namespace std;
 
+
 class MaxPoolLayer : public Layer3D
 {
 private:

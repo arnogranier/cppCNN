@@ -20,6 +20,7 @@
 
 using namespace std;
 
+
 class CNN
 {
 private:

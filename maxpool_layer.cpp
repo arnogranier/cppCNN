@@ -5,6 +5,7 @@ MaxPoolLayer::MaxPoolLayer(int f, int s)
     F=f;S=s;
 };
 
+
 double max(double a, double b, double c, double d){
     double out = a;
     if (b > out) out = b;
