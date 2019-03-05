@@ -1,5 +1,5 @@
-#ifndef db_handler
-#define db_handler
+#ifndef CPPCNN_DB_HANDLER_H_
+#define CPPCNN_DB_HANDLER_H_
 #include <vector>
 #include <fstream>
 #include <math.h>
@@ -16,4 +16,5 @@ public:
 };
 
 void show_image(Array3d);
-#endif
+
+#endif //CPPCNN_DB_HANDLER_H_

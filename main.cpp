@@ -1,7 +1,7 @@
 #include <iostream>
 #include <list>
 #include <ctime>
-#include <CNN.hpp>
+#include <cnn.hpp>
 using namespace std;
 
 int main()
@@ -28,11 +28,11 @@ int main()
     list<FCLayer> classifier{l1, l2};
     
     // Learning rates
-    double classifier_lr = 0.01;
-    double feature_detector_lr = 0.0005;
+    double classifier_lr = 0.03;
+    double feature_detector_lr = 0.0003;
     
     // Number of epochs
-    uint n_epoch = 10;
+    uint n_epoch = 1;
     
     
     // * MAIN * 
@@ -41,24 +41,22 @@ int main()
     CNN net(feature_detector, classifier, classifier_lr, feature_detector_lr);
     
     // Read and set the database
-    net.set_db(filename_train_images, filename_train_labels, 
-               filename_test_images, filename_test_labels);
-
-    // Accuracy test
-    double acc;
-    acc = net.test_accuracy();
-    cout << "Accuracy on test dataset: " << acc << " % " << endl;
-    
+    net.set_db(filename_test_images, filename_test_labels, 
+               filename_test_images, filename_test_labels); 
+  
     // Training phase
-    net.train(n_epoch);
+    //net.train(n_epoch);
+    
+    std::ifstream ifs("saved.txt");
+    ifs >> net;
     
     // Accuracy test
-    acc = net.test_accuracy();
-    cout << "Accuracy on test dataset: " << acc << " % " << endl;
+    cout << "Accuracy on test dataset: " << net.test_accuracy() << endl;
     
+    //std::ofstream ofs("saved.txt");
+    //ofs << net;
+    //ofs.close();
     
     for (auto pointer:feature_detector) delete pointer;
-
-    
     return 0;
 }
