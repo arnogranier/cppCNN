@@ -1,20 +1,27 @@
-#ifndef sigmoid
-#define sigmoid
+#ifndef CPPCNN_SIGMOID_H_
+#define CPPCNN_SIGMOID_H_
+
 #include <iostream>
 #include <vector>
 #include <math.h>
 #include <algorithm>
-#include <array3d.hpp>
 using namespace std;
 
+namespace cppcnn{
+
+// Sigmoid activation function, used to activate fully-connected layers
+// in this project
 class Sigmoid{
-public :
-vector<double> compute(const vector<double>&);
-vector<double> deriv(const vector<double>&);
-vector<double> deriv2(const vector<double>&);
 
-Array3d compute(const Array3d&);
-Array3d deriv(const Array3d&); 
-};
+    public :
+    
+    // sigmoid(X) = [1.0/(1.0+exp(-X_i)) for i = 1..N]
+    vector<double> compute(const vector<double>&) const;
+    
+    // sigmoid'(X) = sigmoid(X)*(1-sigmoid(X))
+    vector<double> deriv(const vector<double>&) const;
 
-#endif
+}; // Sigmoid
+
+} // namespace
+#endif // CPPCNN_SIGMOID_H_

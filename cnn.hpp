@@ -1,25 +1,22 @@
 #ifndef CPPCNN_CNN_H_
 #define CPPCNN_CNN_H_
 
-#include <fc_layer.hpp>
-#include <db_handler.hpp>
-#include <mse.hpp>
-#include <conv_layer.hpp>
-#include <maxpool_layer.hpp>
-#include <array3d.hpp>
-
 #include <iostream>
 #include <list>
-#include <algorithm>
-#include <random>
 #include <stack>
 #include <iterator>
 #include <ctime>
-#include <array>
 #include <fstream>
 
+#include "array3d.hpp"
+#include "db_handler.hpp"
+#include "mse.hpp"
+#include "fc_layer.hpp"
+#include "conv_layer.hpp"
+#include "maxpool_layer.hpp"
 using namespace std;
 
+namespace cppcnn{
 
 class CNN
 {
@@ -43,6 +40,9 @@ public:
     void set_db(string, string, string, string);
     friend ostream& operator<<(ostream&, const CNN&);
     friend istream& operator>>(istream&, CNN&);
-};
+    
+}; // CNN
 
-#endif //cppCNN_CNN_H_
+} // namespace
+#endif // cppCNN_CNN_H_
+

@@ -1,6 +1,8 @@
 #include "cnn.hpp"
 #include <ctime>
 
+namespace cppcnn{
+    
 CNN::CNN(list<Layer3D*> F, list<FCLayer> L, double x, double y)
 {
     feature_detector = F;
@@ -24,7 +26,7 @@ void CNN::set_db(string filename_train_images,
                  string filename_test_images, 
                  string filename_test_labels)
 {
-    DBHandler db;
+    MNIST_DBHandler db;
     train_db_images = db.read_mnist_image(filename_train_images);
     train_db_labels = db.read_mnist_label(filename_train_labels);
     test_db_images = db.read_mnist_image(filename_test_images);
@@ -37,20 +39,18 @@ vector<unsigned int8_t> CNN::predict(vector<Array3d> inputs)
     outputs.reserve(inputs.size());
     Array3d A;
     vector<double> a;
-    for (vector<Array3d>::iterator input = inputs.begin();input != inputs.end();++input){
-        
-        A = *input;
+    for (auto input:inputs){
+        A = input;
         for(auto l:feature_detector){
                 A = l->forward(A);
-                
             }
         a = A.flatten();
-        
-        for (list<FCLayer>::iterator l = classifier.begin();l != classifier.end();++l){
-            a = l->forward(a);
+        for (auto l:classifier){
+            a = l.forward(a);
             a.shrink_to_fit();
         };
-        int8_t output = std::distance(a.begin(), std::max_element(a.begin(), a.end()));
+        int8_t output = std::distance(a.begin(),
+                                      std::max_element(a.begin(), a.end()));
         outputs.push_back(output);
     }
     return outputs;
@@ -72,7 +72,8 @@ void CNN::train(uint n_epoch)
     
     for (uint n=0; n<n_epoch;++n){
         std::cout<<"\r"<<"Epoch "<<n+1<<std::flush;
-        std::shuffle(&rand_indxs[0], &rand_indxs[train_db_images.size()], generator);
+        std::shuffle(&rand_indxs[0], &rand_indxs[train_db_images.size()],
+                     generator);
         
         for (const auto& i:rand_indxs){ 
             A = train_db_images[i];
@@ -114,7 +115,7 @@ void CNN::train(uint n_epoch)
             LZ = Zs.top();
             Zs.pop();
             
-            Array3d Backwrd_err(LZ.n,LZ.m,LZ.h,backwrd_err);
+            Array3d Backwrd_err(LZ.height,LZ.width,LZ.depth,backwrd_err);
             
             for(list<Layer3D*>::reverse_iterator l=feature_detector.rbegin();
                   l!=feature_detector.rend();++l){
@@ -165,7 +166,6 @@ ostream& operator<<(ostream& os, const CNN& s)
 
 istream& operator>>(istream& is, CNN& s)
 {
-    
     double p;
     vector<vector<double> > parameters3d;
     vector<double> tempvec;
@@ -208,3 +208,5 @@ istream& operator>>(istream& is, CNN& s)
     
     return is;
 }
+
+} // namespace

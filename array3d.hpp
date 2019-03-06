@@ -1,5 +1,5 @@
-#ifndef array3d
-#define array3d
+#ifndef CPPCNN_ARRAY3D_H_
+#define CPPCNN_ARRAY3D_H_
 
 #include <iostream>
 #include <vector>
@@ -9,30 +9,53 @@
 
 using namespace std;
 
-class Array3d{
-public:
-    uint n, m, h;
-    vector<double> val;
-    Array3d(){n=0;m=0;h=0;};
-    Array3d(const Array3d & B){n=B.n;m=B.m;h=B.h;val=B.val;};
-    Array3d(uint, uint, uint);
-    Array3d(uint rows, uint cols, uint height, vector<double> v){n=rows;m=cols;h=height;val=v;};
-    void fill_random();
-    
-    double convolve(const Array3d &, int, int) const;
-    
-    void set(int, int, int, double);
-    
-    void zero_padding(int);
-    Array3d operator=(const Array3d & B){n=B.n;m=B.m;h=B.h;val=B.val;return *this;};
-    vector<double> flatten(){return val;};
-    double operator()(uint, uint, uint) const;
-    double& operator()(uint, uint, uint);
-    Array3d& operator*=(double);
-    Array3d& operator-=(const Array3d&);
-    Array3d& operator+=(const Array3d&);
-    Array3d operator*(const Array3d&) const;
-    void print();
-};
+namespace cppcnn{
 
-#endif
+// Light implementation of 3d-array (cube), only implementing useful features 
+// for holding weights of convolutional layers filters and images
+class Array3d{
+    
+public:
+    
+    uint height, width, depth;
+    vector<double> values;
+    
+    Array3d(uint _height, uint _width, uint _depth);
+    
+    Array3d(){height=0;width=0;depth=0;};
+    Array3d(const Array3d & A)
+        {height=A.height;width=A.width;depth=A.depth;values=A.values;};
+    Array3d(uint _height, uint _width, uint _depth, vector<double> _values)
+        {height=_height;width=_width;depth=_depth;values=_values;};
+    Array3d operator=(const Array3d & A)
+        {height=A.height;width=A.width;depth=A.depth;values=A.values;
+         return *this;};
+    void fill_with_random_normal(double mean, double var);
+    void fill_with_zeros();
+    
+    inline double operator()(uint i, uint j, uint k) const 
+    {return values[height*width*k+width*i+j];};
+    inline double& operator()(uint i, uint j, uint k) 
+    {return values[height*width*k+width*i+j];};
+    
+    // Resize the 3d array into a 1d vector
+    vector<double> flatten() const {return values;};
+    
+    // Return the product of convolution of a subset of this (from top left 
+    // corner at (start_i, start_j) and determined by size of the filter) 
+    // and a filter (another array3d of size < to this)
+    double convolve(const Array3d & filter, uint start_i, uint start_j) const;
+    
+    void zero_padding(uint size_padding);
+    
+    Array3d& operator*=(double x);
+    Array3d& operator-=(const Array3d& other_array);
+    Array3d& operator+=(const Array3d& other_array);
+    Array3d operator*(const Array3d& other_array) const;
+    
+    void print();
+    
+}; // Array3d
+
+} // namespace
+#endif // CPPCNN_ARRAY3D_H_

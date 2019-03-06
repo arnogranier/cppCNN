@@ -1,65 +1,71 @@
 #include "fc_layer.hpp"
 
-FCLayer::FCLayer(int l, int L)
+namespace cppcnn{
+
+FCLayer::FCLayer(uint _num_in, uint _num_out)
 {
-    nb_in=l;
-    nb_out=L;  
+    num_in =_num_in;
+    num_out =_num_out;  
     initialize();
 };
 
 void FCLayer::initialize()
 {
-    Array2d tempW(nb_out, nb_in);
-    W = std::move(tempW);
+    W = Array2d(num_out, num_in);
+    W.fill_with_random_normal(0.0, 2.0/(num_in+num_out));
 };
 
-vector<double> FCLayer::activate(const vector<double>& z)
+vector<double> FCLayer::activate(const vector<double>& z) const
 {
     return fun.compute(z);
 };
 
-vector<double> FCLayer::compute(const vector<double>& inputs)
+vector<double> FCLayer::compute(const vector<double>& inputs) const
 {
     return W.dot(inputs);
 };
 
-vector<double> FCLayer::forward(const vector<double>& inputs)
+vector<double> FCLayer::forward(const vector<double>& inputs) const
 {
     return activate(compute(inputs));
 };
 
-vector<double> FCLayer::get_layer_err(const vector<double>& z, const vector<double>& backw_err)
+vector<double> FCLayer::get_layer_err(const vector<double>& z,
+                                      const vector<double>& backwrd_err) const
 {
-    vector<double> dz = fun.deriv(z);
-    std::transform(dz.begin(), dz.end(), backw_err.begin(), dz.begin(),
-              multiplies<double>());
-    return dz;
+    vector<double> out = fun.deriv(z);
+    std::transform(out.begin(), out.end(), backwrd_err.begin(), out.begin(),
+                   multiplies<double>());
+    return out;
 };
 
-vector<double> FCLayer::backward(const vector<double>& layer_err)
+vector<double> FCLayer::backward(const vector<double>& layer_err) const
 {
-    vector<double> res = W.Tdot(layer_err);
-    return res;
+    return W.Tdot(layer_err);
 };
 
-void FCLayer::update(const vector<double>& u, const vector<double>& v, double lr)
+void FCLayer::update(const vector<double>& layer_err, const vector<double>& z,
+                     double lr)
 {
-    uint usize=u.size();
-    uint vsize=v.size();
-    for (unsigned int i=0;i<usize;++i){
-        for (unsigned int j=0;j<vsize;++j){
-            W.val[i*nb_in+j] -= u[i]*v[j]*lr;
+    uint err_size = layer_err.size();
+    uint z_size = z.size();
+    double current_err;
+    for (uint i=0;i<err_size;++i){
+        current_err = layer_err[i];
+        for (uint j=0;j<z_size;++j){
+            W.values[i*num_in+j] -= current_err*z[j]*lr;
         }
     } 
 };
 
-
-vector<double> FCLayer::get_learnable_parameters()
+vector<double> FCLayer::get_learnable_parameters() const
 {
-    return W.val;
+    return W.values;
 }
 
-void FCLayer::set_learnable_parameters(vector<double> v)
+void FCLayer::set_learnable_parameters(vector<double> learnable_parameters)
 {
-    W.val = v;
+    W.values = learnable_parameters;
 }
+
+} // namespace

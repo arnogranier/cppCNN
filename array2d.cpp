@@ -1,76 +1,100 @@
 #include "array2d.hpp"
 
-Array2d::Array2d(uint rows, uint cols)
+namespace cppcnn{
+
+Array2d::Array2d(uint _num_rows, uint _num_cols)
 {
-    n=rows;m=cols;
+    num_rows=_num_rows;
+    num_cols=_num_cols;
+}
+
+void Array2d::fill_with_zeros()
+{
+    values.clear();
+    uint size = num_rows * num_cols;
+    values.reserve(size);
+    for (uint it=0;it<size;it++){
+        values.push_back(0.0);
+    };
+}
+
+void Array2d::fill_with_random_normal(double mean, double var)
+{
     std::random_device rd;
     std::default_random_engine generator(rd());
-    std::normal_distribution<double> distribution(0, 1.0/m);
-    uint size = n * m;
-    val.reserve(size);
-    for (uint i=0;i<size;i++){
-        val.push_back(distribution(generator));
+    std::normal_distribution<double> distribution(mean, var);
+    values.clear();
+    uint size = num_rows * num_cols;
+    values.reserve(size);
+    for (uint it=0;it<size;it++){
+        values.push_back(distribution(generator));
     };
-};
-
-Array2d& Array2d::operator*=(double d)
-{
-    transform(val.begin(), val.end(), val.begin(),
-              bind1st(multiplies<double>(), d));
-    return *this;
-};
-
-Array2d& Array2d::operator-=(const Array2d & A)
-{
-    transform(val.begin(), val.end(), A.val.begin(), val.begin(),
-              minus<double>());
-    return *this;
-};
-
-vector<double> Array2d::dot(const vector<double>& v)
-{
-    vector<double> vout;
-    vout.reserve(v.size());
-    assert(v.size() == m);
-    
-    double temp;
-    uint size = n*m;
-    //for (vector<double>::iterator va =val.begin();va!=val.end();){
-    for (uint i=0;i<size;){
-        temp = 0;
-        for (auto x:v){
-            temp += val[i] * x;
-            ++i;
-        }
-        vout.push_back(temp);
-    };
-    return vout;
 }
 
-vector<double> Array2d::Tdot(const vector<double>& v)
+Array2d& Array2d::operator*=(double x)
 {
-    vector<double> vout;
-    vout.reserve(v.size());
-    assert(v.size() == n);
+    transform(values.begin(), values.end(), values.begin(),
+              bind1st(std::multiplies<double>(), x));
+    return *this;
+}
+
+Array2d& Array2d::operator-=(const Array2d & other_array)
+{
+    assert((other_array.num_rows == num_rows) &&
+           (other_array.num_cols == num_cols));
+    
+    transform(values.begin(), values.end(), other_array.values.begin(),
+              values.begin(), std::minus<double>());
+    return *this;
+}
+
+std::vector<double> Array2d::dot(const std::vector<double>& extern_vec) const
+{
+    assert(extern_vec.size() == num_cols);
+    
+    std::vector<double> out_vector;
+    out_vector.reserve(extern_vec.size());
     
     double temp;
-    for (uint i=0;i<m;++i){
+    uint size = num_rows*num_cols;
+    for (uint it=0;it<size;){
         temp = 0;
-        for (uint j=0;j<n;++j){
-            temp += val[j*m+i] * v[j];
+        for (auto val:extern_vec){
+            temp += values[it] * val;
+            ++it;
         }
-        vout.push_back(temp);
+        out_vector.push_back(temp);
     };
-    return vout;
+    return out_vector;
+}
+
+std::vector<double> Array2d::Tdot(const std::vector<double>& extern_vec) const
+{
+    assert(extern_vec.size() == num_rows);
+    
+    std::vector<double> out_vector;
+    out_vector.reserve(extern_vec.size());
+    
+    double temp;
+    for (uint i=0;i<num_cols;++i){
+        temp = 0;
+        for (uint j=0;j<num_rows;++j){
+            temp += values[j*num_cols+i] * extern_vec[j];
+        }
+        out_vector.push_back(temp);
+    };
+    return out_vector;
 }
 
 
-void Array2d::print()
+void Array2d::print() const
 {
-    for (uint i=0;i<n;i++){
-        for (uint j=0;j<m;j++){
-            std::cout << val[i*m+j] << " ";
+    for (uint i=0;i<num_rows;i++){
+        for (uint j=0;j<num_cols;j++){
+            std::cout << values[i*num_cols+j] << " ";
         }
         std::cout << std::endl;
     }
-};
+}
+
+} // namespace

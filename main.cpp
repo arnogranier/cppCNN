@@ -3,7 +3,8 @@
 #include <ctime>
 #include <cnn.hpp>
 using namespace std;
-
+using namespace cppcnn;
+    
 int main()
 {
     
@@ -45,10 +46,12 @@ int main()
                filename_test_images, filename_test_labels); 
   
     // Training phase
-    //net.train(n_epoch);
-    
-    std::ifstream ifs("saved.txt");
-    ifs >> net;
+    clock_t t;
+    t = clock();
+    net.train(n_epoch);
+    cout << 1000*(clock()-t)/CLOCKS_PER_SEC;
+    //std::ifstream ifs("saved.txt");
+    //ifs >> net;
     
     // Accuracy test
     cout << "Accuracy on test dataset: " << net.test_accuracy() << endl;
