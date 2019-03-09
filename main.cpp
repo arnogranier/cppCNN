@@ -2,6 +2,7 @@
 #include <list>
 #include <ctime>
 #include <cnn.hpp>
+#include <mse.hpp>
 using namespace std;
 using namespace cppcnn;
     
@@ -32,6 +33,8 @@ int main()
     double classifier_lr = 0.03;
     double feature_detector_lr = 0.0003;
     
+    Loss* loss = new MSE;
+    
     // Number of epochs
     uint n_epoch = 1;
     
@@ -39,26 +42,29 @@ int main()
     // * MAIN * 
     
     // Building the network
-    CNN net(feature_detector, classifier, classifier_lr, feature_detector_lr);
+    CNN net(feature_detector, classifier, loss,
+            feature_detector_lr, classifier_lr);
     
     // Read and set the database
-    net.set_db(filename_test_images, filename_test_labels, 
-               filename_test_images, filename_test_labels); 
+    MNIST_Handler database_loader;
+    vector<Array3d> train_database_images = 
+                     database_loader.read_mnist_image(filename_train_images);
+    vector<int8_t> train_database_labels =
+                    database_loader.read_mnist_label(filename_train_labels);
+    vector<Array3d> test_database_images = 
+                     database_loader.read_mnist_image(filename_test_images);
+    vector<int8_t> test_database_labels = 
+                    database_loader.read_mnist_label(filename_test_labels);
+    net.set_train_database(&test_database_images, &test_database_labels);
+    net.set_test_database(&test_database_images, &test_database_labels);
   
     // Training phase
-    clock_t t;
-    t = clock();
-    net.train(n_epoch);
-    cout << 1000*(clock()-t)/CLOCKS_PER_SEC;
-    //std::ifstream ifs("saved.txt");
-    //ifs >> net;
+    //net.train(n_epoch);
     
     // Accuracy test
+    net.load("notrain");
     cout << "Accuracy on test dataset: " << net.test_accuracy() << endl;
-    
-    //std::ofstream ofs("saved.txt");
-    //ofs << net;
-    //ofs.close();
+    //net.save("notrain");
     
     for (auto pointer:feature_detector) delete pointer;
     return 0;

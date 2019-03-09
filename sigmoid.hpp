@@ -16,10 +16,10 @@ class Sigmoid{
     public :
     
     // sigmoid(X) = [1.0/(1.0+exp(-X_i)) for i = 1..N]
-    vector<double> compute(const vector<double>&) const;
+    vector<double> compute(const vector<double>& X) const;
     
     // sigmoid'(X) = sigmoid(X)*(1-sigmoid(X))
-    vector<double> deriv(const vector<double>&) const;
+    vector<double> deriv(const vector<double>& X) const;
 
 }; // Sigmoid
 

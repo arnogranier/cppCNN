@@ -5,13 +5,13 @@ namespace cppcnn{
 // Translate a 4-length char into the corresponding int   
 int char4_to_int(char* p)
 {
-    return   (unsigned int8_t)p[0] * std::pow(2,24) 
-           + (unsigned int8_t)p[1] * std::pow(2,16)
-           + (unsigned int8_t)p[2] * std::pow(2,8)
-           + (unsigned int8_t)p[3];
+    return   (int8_t)p[0] * std::pow(2,24) 
+           + (int8_t)p[1] * std::pow(2,16)
+           + (int8_t)p[2] * std::pow(2,8)
+           + (int8_t)p[3];
 }
 
-vector<Array3d> MNIST_DBHandler::read_mnist_image(string filename) const
+vector<Array3d> MNIST_Handler::read_mnist_image(string filename) const
 {
     std::ifstream file(filename, ios::binary);
     assert(file.is_open());
@@ -63,12 +63,12 @@ vector<Array3d> MNIST_DBHandler::read_mnist_image(string filename) const
     return vec;
 };
 
-vector<unsigned int8_t> MNIST_DBHandler::read_mnist_label(string filename) const
+vector<int8_t> MNIST_Handler::read_mnist_label(string filename) const
 {
     std::ifstream file(filename, ios::binary);
     assert(file.is_open());
     
-    vector<unsigned int8_t> vec;
+    vector<int8_t> vec;
     
     int8_t size_of_int32 = sizeof(int32_t);
     char temphead[size_of_int32];
@@ -87,7 +87,7 @@ vector<unsigned int8_t> MNIST_DBHandler::read_mnist_label(string filename) const
     for(int n = 0; n < number_of_labels; ++n)
     {
         file.read(&temp, 1);
-        vec.push_back((unsigned int8_t) temp);
+        vec.push_back((int8_t) temp);
     }
     
     return vec;

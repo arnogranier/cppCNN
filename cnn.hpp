@@ -7,10 +7,11 @@
 #include <iterator>
 #include <ctime>
 #include <fstream>
+#include <assert.h>
 
 #include "array3d.hpp"
 #include "db_handler.hpp"
-#include "mse.hpp"
+#include "loss.hpp"
 #include "fc_layer.hpp"
 #include "conv_layer.hpp"
 #include "maxpool_layer.hpp"
@@ -18,28 +19,50 @@ using namespace std;
 
 namespace cppcnn{
 
+// Instantiate a Convolutional neural network as a feature_detector (a list
+// of convolutional layers and max pooling layers) and a classifier (a list 
+// of fully connected layers)
+// Provide the methods for the user to interact with the network (set database,
+// train, predict)
 class CNN
 {
+    
 private:
-    MSE loss;
-    double c_lr, fd_lr;
-    vector<Array3d> train_db_images;
-    vector<unsigned int8_t > train_db_labels;
-    vector<Array3d> test_db_images;
-    vector<unsigned int8_t > test_db_labels;
-public:
     list<Layer3D*> feature_detector;
     list<FCLayer> classifier;
-    CNN(list<Layer3D*>, list<FCLayer>, double, double);
+    Loss* loss;
+    double classifier_lr, feature_detector_lr; //learning rates
+    vector<Array3d>* train_database_images;
+    vector<int8_t >* train_database_labels;
+    vector<Array3d>* test_database_images;
+    vector<int8_t >* test_database_labels;
+public:
+    CNN(list<Layer3D*> _feature_detector, list<FCLayer> _classifier,
+        Loss* _loss, double _feature_detector_lr, double _classifier_lr);
+    
+    // Call the initialize method of all layers
     void initialize();
-    vector<unsigned int8_t> predict(vector<Array3d>);
-    void train(uint);
+    
+    void set_train_database(vector<Array3d>* images, vector<int8_t >* labels);
+    void set_test_database(vector<Array3d>* images, vector<int8_t >* labels);
+    
+    // Takes as input a vector if images and return the corresponding vector
+    // of predicted labels
+    vector<int8_t> predict(vector<Array3d> inputs);
+    
+    // Train the network for n_peoch epochs on the train database
+    void train(uint n_peoch);
+    
+    // Test accuracy of the network on the test database
     double test_accuracy();
-    void set_train_db(vector<Array3d>&, vector<unsigned int8_t >&);
-    void set_test_db(vector<Array3d>&, vector<unsigned int8_t >&);
-    void set_db(string, string, string, string);
-    friend ostream& operator<<(ostream&, const CNN&);
-    friend istream& operator>>(istream&, CNN&);
+    
+    // Save learnable parameters of the network into os (usually a file)
+    friend ostream& operator<<(ostream& os , const CNN& net);
+    void save(string name);
+    
+    // Retrieve learnable parameters
+    friend istream& operator>>(istream& is, CNN& net);
+    void load(string name);
     
 }; // CNN
 

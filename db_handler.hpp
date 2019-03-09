@@ -13,12 +13,12 @@ namespace cppcnn{
 // Handle the MNIST database 
 // the database can be found on http://yann.lecun.com/exdb/mnist/
 // together with an explanation on the file formats
-class MNIST_DBHandler
+class MNIST_Handler
 {
 
 public:    
-    vector<Array3d> read_mnist_image(string) const;
-    vector<unsigned int8_t> read_mnist_label(string) const;
+    vector<Array3d> read_mnist_image(string filename) const;
+    vector<int8_t> read_mnist_label(string filename) const;
 
 }; // MNIST_DBHandler
 

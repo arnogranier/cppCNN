@@ -57,13 +57,13 @@ Array3d ConvLayer::get_layer_err(const Array3d& Z,
     return Backwarded_error * fun.deriv(Z);
 }
 
-Array3d ConvLayer::backward(const Array3d& Layer_err, const Array3d& Z) const
+Array3d ConvLayer::backward(const Array3d& Delta, const Array3d& Z) const
 {
-    uint height = Layer_err.height;
-    uint width = Layer_err.width;
+    uint height = Delta.height;
+    uint width = Delta.width;
     
-    Array3d out(size_stride*(Layer_err.height-1)+size_filter-2*size_padding,
-                size_stride*(Layer_err.width-1)+size_filter-2*size_padding,
+    Array3d out(size_stride*(Delta.height-1)+size_filter-2*size_padding,
+                size_stride*(Delta.width-1)+size_filter-2*size_padding,
                 prev_depth);
     out.fill_with_zeros();
     
@@ -77,7 +77,7 @@ Array3d ConvLayer::backward(const Array3d& Layer_err, const Array3d& Z) const
             h_shift = i * size_stride;
             for (uint j=0;j<width;++j){
                 w_shift = j * size_stride;
-                err = Layer_err(i,j,r);
+                err = Delta(i,j,r);
                 for (uint p=0;p<size_filter;++p){
                     x_out = p+h_shift;
                     for (uint q=0;q<size_filter;++q){
@@ -94,12 +94,12 @@ Array3d ConvLayer::backward(const Array3d& Layer_err, const Array3d& Z) const
     return out;
 }
 
-void ConvLayer::update(const Array3d& Layer_err, const Array3d& Z, double lr)
+void ConvLayer::update(const Array3d& Delta, const Array3d& Z, double lr)
 {
     double temp;
     int x_out;
-    uint height =Layer_err.height;
-    uint width =Layer_err.width;
+    uint height =Delta.height;
+    uint width =Delta.width;
     for (uint p=0;p<size_filter;++p){
         for (uint q=0;q<size_filter;++q){
             for (uint t=0;t<prev_depth;++t){
@@ -108,7 +108,7 @@ void ConvLayer::update(const Array3d& Layer_err, const Array3d& Z, double lr)
                     for (uint i=0;i<height;++i){
                         x_out = p+ i * size_stride;
                         for (uint j=0;j<width;++j){ 
-                            temp += Z(x_out, q + j * size_stride,t)*Layer_err(i,j,r);
+                            temp += Z(x_out, q + j * size_stride,t)*Delta(i,j,r);
                         }
                     }
                     filters[r](p,q,t) -= lr*temp;

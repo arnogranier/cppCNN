@@ -52,26 +52,26 @@ Array3d MaxPoolLayer::get_layer_err(const Array3d& Z,
     return Backwarded_error;
 };
 
-Array3d MaxPoolLayer::backward(const Array3d& Layer_err,const Array3d& Z) const
+Array3d MaxPoolLayer::backward(const Array3d& Delta,const Array3d& Z) const
 {
-    Array3d out(S*(Layer_err.height-1)+F,S*(Layer_err.width-1)+F,Layer_err.depth);
+    Array3d out(S*(Delta.height-1)+F,S*(Delta.width-1)+F,Delta.depth);
     out.fill_with_zeros();
-    for (uint k=0;k<Layer_err.depth;++k){
-        for (uint i=0;i<Layer_err.height;++i){
-            for (uint j=0;j<Layer_err.width;++j){
+    for (uint k=0;k<Delta.depth;++k){
+        for (uint i=0;i<Delta.height;++i){
+            for (uint j=0;j<Delta.width;++j){
                 double _max = max(Z(F*i, F*j, k), Z(F*i, F*j+1, k),
                                    Z(F*i+1, F*j, k), Z(F*i+1, F*j+1, k));
                 if (Z(F*i, F*j, k) == _max){
-                    out(F*i, F*j, k) = Layer_err(i,j,k);
+                    out(F*i, F*j, k) = Delta(i,j,k);
                 }
                 else if (Z(F*i, F*j+1, k) == _max){
-                    out(F*i, F*j+1, k) = Layer_err(i,j,k);
+                    out(F*i, F*j+1, k) = Delta(i,j,k);
                 }
                 else if (Z(F*i+1, F*j, k) == _max){
-                    out(F*i+1, F*j, k) = Layer_err(i,j,k);
+                    out(F*i+1, F*j, k) = Delta(i,j,k);
                 }
                 else {
-                    out(F*i+1, F*j+1, k) = Layer_err(i,j,k);
+                    out(F*i+1, F*j+1, k) = Delta(i,j,k);
                 }
             }
         }

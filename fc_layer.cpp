@@ -39,19 +39,19 @@ vector<double> FCLayer::get_layer_err(const vector<double>& z,
     return out;
 };
 
-vector<double> FCLayer::backward(const vector<double>& layer_err) const
+vector<double> FCLayer::backward(const vector<double>& delta) const
 {
-    return W.Tdot(layer_err);
+    return W.Tdot(delta);
 };
 
-void FCLayer::update(const vector<double>& layer_err, const vector<double>& z,
+void FCLayer::update(const vector<double>& delta, const vector<double>& z,
                      double lr)
 {
-    uint err_size = layer_err.size();
+    uint err_size = delta.size();
     uint z_size = z.size();
     double current_err;
     for (uint i=0;i<err_size;++i){
-        current_err = layer_err[i];
+        current_err = delta[i];
         for (uint j=0;j<z_size;++j){
             W.values[i*num_in+j] -= current_err*z[j]*lr;
         }

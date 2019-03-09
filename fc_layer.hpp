@@ -20,8 +20,8 @@ public:
     vector<double> activate(const vector<double>& z) const;
     vector<double> get_layer_err(const vector<double>& z,
                                  const vector<double>& backwrd_err) const;
-    vector<double> backward(const vector<double>& layer_err) const;
-    void update(const vector<double>& layer_err, const vector<double>& z,
+    vector<double> backward(const vector<double>& delta) const;
+    void update(const vector<double>& delta, const vector<double>& z,
                 double lr);
     vector<double> get_learnable_parameters() const;
     void set_learnable_parameters(vector<double> learnable_parameters);
