@@ -85,7 +85,8 @@ int main()
     acc = net.test_accuracy();
     cout << "Accuracy on test dataset: " << acc << " % " << endl;
     
-    
+    net.save("mynet");
+    // net.load("mynet");
     for (auto pointer:feature_detector) delete pointer;
 
     
