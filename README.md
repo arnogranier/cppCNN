@@ -11,9 +11,7 @@ Currently training at 96% on a dirty implementation of LeNet after 10 epochs. (L
 ## To-do list:
 
 Mandatory :
-  -  clean up the code
-  -  comment
-  -  learnable parameters saving and retrieving 
+  -  comment (for the layers codes)
   
 Optional:
   +  minibatch learning
