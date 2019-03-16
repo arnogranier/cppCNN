@@ -6,7 +6,7 @@ A c++ implementation of Convolutional neural network, with an application on MNI
 
 You can find the proposed subject together with a brief introductive survey of CNN's theory here : [Subject](https://www.cjoint.com/doc/19_01/IADnLhx7Ve0_Arno-Granier-sujet.pdf)
 
-Currently training at 98% on a dirty implementation of LeNet after 10 epochs. (LeNet is a classical architecture for OCR introduced in _LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324._ [pdf](http://www.dengfanxin.cn/wp-content/uploads/2016/03/1998Lecun.pdf) 
+Currently training at 98% on LeNet architecture (LeNet is a classical architecture for OCR introduced in _LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324._ [pdf](http://www.dengfanxin.cn/wp-content/uploads/2016/03/1998Lecun.pdf) 
 
 ## To-do list:
 
