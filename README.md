@@ -8,6 +8,7 @@ You can find the proposed subject together with a brief introductive survey of C
 
 Currently training at 98% on LeNet architecture (LeNet is a classical architecture for OCR introduced in _LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324._ [pdf](http://www.dengfanxin.cn/wp-content/uploads/2016/03/1998Lecun.pdf) 
 
+Rapport proposé : [pdf](https://www.docdroid.net/aaPf81b/cppcnn-rapport.pdf)
 ## To-do list:
 
 Mandatory :
