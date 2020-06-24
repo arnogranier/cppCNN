@@ -1,27 +1,13 @@
 # cpp CNN
 ## Final project for [ENSTA's SIM202 course](https://synapses.ensta-paristech.fr/catalogue/2018-2019/ue/3021/SIM202-projet-de-simulation-numerique)
 
-# **WORK IN PROGRESS ...**
 A c++ implementation of Convolutional neural network, with an application on MNIST hand-written digits recognition.
 
 You can find the proposed subject together with a brief introductive survey of CNN's theory here : [Subject](https://www.cjoint.com/doc/19_01/IADnLhx7Ve0_Arno-Granier-sujet.pdf)
 
 Currently training at 98% on LeNet architecture (LeNet is a classical architecture for OCR introduced in _LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324._ [pdf](http://www.dengfanxin.cn/wp-content/uploads/2016/03/1998Lecun.pdf) 
 
-Rapport proposé : [pdf](https://www.docdroid.net/aaPf81b/cppcnn-rapport.pdf)
-## To-do list:
-
-Mandatory :
-  -  comment (for the layers codes)
-  
-Optional:
-  +  minibatch learning
-  +  padding
-  +  parallelism (threads)
-  +  easier way of passing the net architecture
-  +  other optimisation methods (adam, adagrad, momentum gradient descent)
-  +  cross entropy loss
-  +  other applications
+Rapport proposé (french) : [pdf](https://www.docdroid.net/aaPf81b/cppcnn-rapport.pdf)
 
 ## Architecture
    ![alt text](https://image.noelshack.com/fichiers/2019/08/1/1550521768-cppcnn-2.png)
