@@ -10,7 +10,7 @@ Currently training at 98% on LeNet architecture (LeNet is a classical architectu
 Rapport proposé (french) : [pdf](https://www.docdroid.net/aaPf81b/cppcnn-rapport.pdf)
 
 ## Architecture
-   ![alt text](https://ibb.co/b37fKvb)
+   ![alt text](https://i.ibb.co/Mh9XC1B/Screenshot-from-2020-10-20-18-45-19.png)
 
 ## Example of usage
 ```c++
